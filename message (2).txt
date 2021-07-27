@@ -1,0 +1,113 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import plotly.express as px
+import pygal
+# trace 1
+trace1 = pd.read_csv("C:/Users/DELL/Desktop/projects/python/final projects/pageviews-20190707-070000.txt",
+                     sep=" ", header=None)
+ar = trace1[trace1[0].str.startswith("ar")]  # arabic 
+en = trace1[trace1[0].str.startswith("en")]  # english
+es = trace1[trace1[0].str.startswith("es")]  # spanish
+fr = trace1[trace1[0].str.startswith("fr")]  # french
+ru = trace1[trace1[0].str.startswith("ru")]  # russian
+zh = trace1[trace1[0].str.startswith("zh")]  # chinese
+g = pd.concat([ar, en, es, fr, ru, zh])
+num_views = [ar.iloc[:, 2].sum(), en.iloc[:, 2].sum(), es.iloc[:, 2].sum(),
+             fr.iloc[:, 2].sum(), ru.iloc[:, 2].sum(), zh.iloc[:, 2].sum()]
+labels1 = ["arabic", "english", "spanish", "french", "russian", "chinese"]
+ones1 = np.ones(6)*0.05
+plt.pie(num_views, labels=labels1, autopct='%1.1f%%', explode=ones1)
+plt.legend()
+plt.title("the percentage of number of views for universal language")
+plt.show()
+
+
+ar_wiki = ar[ar[0].str.endswith("ar")]      # wikipedia
+ar_wiki_books = ar[ar[0].str.endswith("b")]  # wikibooks
+ar_wiktionary = ar[ar[0].str.endswith("d")]  # wiktionary
+ar_wikimedia = ar[ar[0].str.endswith("m")]  # wikimedia
+ar_wiki_news = ar[ar[0].str.endswith("n")]  # wikinews
+wiki = [ar_wiki.iloc[:, 2].sum(), ar_wiki_books.iloc[:, 2].sum(), ar_wiktionary.iloc[:, 2].sum(),
+        ar_wikimedia.iloc[:, 2].sum(), ar_wiki_news.iloc[:, 2].sum()]
+labels2 = ["wikipedia", "wikibooks", "wiktionary", "wikimedia", "wikinews"]
+
+plt.bar(labels2, wiki, width=0.35, label='Media type', color="#132c33")
+for index, data in enumerate(wiki):
+    plt.text(x=index, y=data+5, s=f"{data}", fontdict=dict(fontsize=10), ha='center')
+plt.tight_layout()
+plt.title("number of users who enter the arabic wiki sites", fontsize=10)
+plt.ylabel("number of user", fontsize=10)
+plt.grid()
+plt.show()
+
+
+x = fr.sort_values(2, ascending=False)
+plt.figure(figsize=(16, 10))
+plt.bar(x[1].head(10), x[2].head(10), width=0.35, color="#4ca1a3")
+plt.title("number of users who read top 10 articles in french sites")
+plt.xlabel("name of article")
+plt.ylabel("number of users")
+plt.show()
+
+
+tr = trace1[trace1[0].str.startswith("tr")]
+y = tr.sort_values(2, ascending=False)
+plt.figure(figsize=(18, 5))
+plt.barh(y[1].head(10), y[2].head(10), color="#511281")
+plt.title("number of users who read top 10 articles in turkish sites")
+plt.ylabel("name of article")
+plt.xlabel("number of users")
+plt.show()
+
+# trace 2
+trace2 = pd.read_csv("C:/Users/DELL/Desktop/projects/python/final projects/geoeditors-monthly-2019-07.tsv",
+                     sep="\t", header=None)
+mn = trace2[trace2[0].str.startswith("mn")]  # Mongolian
+worldmap = pygal.maps.world.World()
+worldmap.title = 'Mongolian editors countries'
+worldmap.add('Mongolian editors', ["mn", "us", "fr", "de", "cl", "ba", "fi", "gb", "hk", "jp", "lt", "sg"])
+worldmap.render_to_file('abc.svg')
+
+
+_5to99 = trace2[trace2[2] == '5 to 99'].count()
+_100or_more = trace2[trace2[2] == '100 or more'].count()
+labels2 = ['5 to 99', '100 or more']
+y = [_5to99[0], _100or_more[0]]
+ones2 = np.ones(2)*0.05
+plt.pie(y, labels=labels2, autopct='%1.1f%%', explode=ones2)
+plt.title("the percentage between 5to99 and 100or more of edits")
+plt.legend()
+plt.show()
+
+# trace 3
+trace3f = pd.read_csv("C:/Users/DELL/Desktop/projects/python/final projects/unique_devices_per_project_family_daily-2019-07-06/"
+                      "unique_devices_per_project_family_daily-2019-07-06.txt", sep="\t", header=None)
+trace3d = pd.read_csv("C:/Users/DELL/Desktop/projects/python/final projects/unique_devices_per_domain_daily-2019-07-07.txt",
+                      sep="\t", header=None)
+fig2 = px.sunburst(trace3f, path=[0, 2], title="number of users who entered each site")
+fig2.show()
+
+plt.figure(figsize=(18, 5))
+plt.plot(trace3f[0], trace3f[1], label="the unique underestimate")
+plt.plot(trace3f[0], trace3f[2], label="the estimate")
+plt.plot(trace3f[0], trace3f[3], label=" the offset")
+plt.ylabel("numbers")
+plt.xlabel("wiki sites")
+plt.title("relation between the unique underestimate,\n the estimate and the offset")
+plt.legend()
+plt.show()
+
+ar = trace3d[trace3d[0].str.startswith("ar")]
+en = trace3d[trace3d[0].str.startswith("en")]
+es = trace3d[trace3d[0].str.startswith("es")]
+fr = trace3d[trace3d[0].str.startswith("fr")]
+ru = trace3d[trace3d[0].str.startswith("ru")]
+zh = trace3d[trace3d[0].str.startswith("zh")]
+num_views = [ar.iloc[:, 2].sum(), en.iloc[:, 2].sum(), es.iloc[:, 2].sum(),
+             fr.iloc[:, 2].sum(), ru.iloc[:, 2].sum(), zh.iloc[:, 2].sum()]
+labels4 = ["arabic", "english", "spanish", "french", "russian", "chinese"]
+plt.barh(labels4, num_views, color='#ff6701')
+plt.title("The number of estimates for each language")
+plt.xlabel('Number of estimates')
+plt.show()
